@@ -14,7 +14,9 @@
 [root@linux-node1 ~]# kubectl create clusterrolebinding kubelet-bootstrap --clusterrole=system:node-bootstrapper --user=kubelet-bootstrap
 clusterrolebinding "kubelet-bootstrap" created
 ```
-
+```
+kubelet启动时需要向API发送tsl bootstrap请求，所以要将bootstrap的token设置成对应我们的角色，这样kubectl才有权限创建请求，kubelet启来的时候会动态的获取api
+```
 3.创建 kubelet bootstrapping kubeconfig 文件
 设置集群参数
 ```
@@ -26,10 +28,10 @@ clusterrolebinding "kubelet-bootstrap" created
 Cluster "kubernetes" set.
 ```
 
-设置客户端认证参数
+设置客户端认证参数（注意：这个token每次安装集群都不一样，是你安装apiserver的时候生成的，可以在/opt/kubernetes/ssl/ bootstrap-token.csv查看）
 ```
 [root@linux-node1 ~]# kubectl config set-credentials kubelet-bootstrap \
-   --token=ad6d5bb607a186796d8861557df0d17f \
+   --token=3cb4b809d48cd5ebab06156210af11a1 \
    --kubeconfig=bootstrap.kubeconfig   
 User "kubelet-bootstrap" set.
 ```
@@ -52,7 +54,7 @@ Switched to context "default".
 [root@linux-node1 kubernetes]# scp bootstrap.kubeconfig 192.168.56.13:/opt/kubernetes/cfg
 ```
 
-部署kubelet
+部署kubelet(计算节点，cni网络接口插件)
 1.设置CNI支持
 ```
 [root@linux-node2 ~]# mkdir -p /etc/cni/net.d
@@ -70,7 +72,7 @@ Switched to context "default".
 
 ```
 
-2.创建kubelet目录
+2.创建kubelet目录（未来的kubelet数据放在 /var/lib/kubelet）
 ```
 [root@linux-node2 ~]# mkdir /var/lib/kubelet
 ```
