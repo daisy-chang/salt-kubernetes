@@ -28,7 +28,8 @@ kubelet启动时需要向API发送tsl bootstrap请求，所以要将bootstrap的
 Cluster "kubernetes" set.
 ```
 
-设置客户端认证参数（注意：这个token每次安装集群都不一样，是你安装apiserver的时候生成的，可以在/opt/kubernetes/ssl/ bootstrap-token.csv查看）
+设置客户端认证参数
+（注意：这个token每次安装集群都不一样，是你安装apiserver的时候生成的，可以在/opt/kubernetes/ssl/ bootstrap-token.csv查看）
 ```
 [root@linux-node1 ~]# kubectl config set-credentials kubelet-bootstrap \
    --token=3cb4b809d48cd5ebab06156210af11a1 \
@@ -134,10 +135,19 @@ node-csr-0_w5F1FM_la_SeGiu3Y5xELRpYUjjT2icIFk9gO9KOU   1m        kubelet-bootstr
 7.批准kubelet 的 TLS 证书请求
 ```
 [root@linux-node1 ~]# kubectl get csr|grep 'Pending' | awk 'NR>0{print $1}'| xargs kubectl certificate approve
+证书批准后会看到client认证文件
+[root@linux-node2 ~]# ll /opt/kubernetes/ssl/
+-rw-r--r-- 1 root root 1046 Jun  4 08:43 kubelet-client.crt
+-rw------- 1 root root  227 Jun  4 08:37 kubelet-client.key
+-rw-r--r-- 1 root root 2185 Jun  4 07:57 kubelet.crt
+-rw------- 1 root root 1675 Jun  4 07:57 kubelet.key
 ```
+
 执行完毕后，查看节点状态已经是Ready的状态了
+```
 [root@linux-node1 ssl]#  kubectl get node
 NAME            STATUS    ROLES     AGE       VERSION
+```
 
 ## 部署Kubernetes Proxy
 1.配置kube-proxy使用LVS
