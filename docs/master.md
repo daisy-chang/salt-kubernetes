@@ -1,4 +1,14 @@
 ## 1.部署Kubernetes API服务部署
+```
+APIserver提供集群管理的restapi接口，包括认证授权，数据校验，以及集群状态变更等
+  -只有APIserver才可以直接操作etcd
+  -其他模块通过APIserver查询或者修改数据
+  -提供其他模块之间的数据交互和通信的枢纽
+Schedule负责分配调度Pod到集群内的node节点
+  -监听kube-apiserver，查询还未分配的Node的Pod
+  -根据调度策略为这些Pod节点
+Controller-manager由一系列的控制器组成，它通过
+```
 ### 0.准备软件包
 ```
 [root@linux-node1 ~]# cd /usr/local/src/kubernetes
@@ -276,7 +286,9 @@ Context "kubernetes" created.
 [root@linux-node1 src]# kubectl config use-context kubernetes
 Switched to context "kubernetes".
 ```
-
+```
+上面的配置会在/root/.kube/config中生成配置文件，用于kubectl和API的通信，如果在其它节点也想运行kubectl，需要把这个配置文件copy到其它几点g
+```
 8.使用kubectl工具
 ```
 [root@linux-node1 ~]# kubectl get cs
