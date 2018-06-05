@@ -104,6 +104,26 @@ wget https://github.com/containernetworking/plugins/releases/download/v0.7.1/cni
       --no-sync -C https://192.168.56.11:2379,https://192.168.56.12:2379,https://192.168.56.13:2379 \
 mk /kubernetes/network/config '{ "Network": "10.2.0.0/16", "Backend": { "Type": "vxlan", "VNI": 1 }}' >/dev/null 2>&1
 ```
+问题解决
+```
+配置上面的etcd key后，启动flannel时报错：
+Jun  6 06:15:37 linux-node1 flanneld: E0606 06:15:37.158899    3068 main.go:349] Couldn't fetch network config: 100: Key not found (/kubernetes) [12]
+后在网上查，应该是与etcd key无法通信，所以应该是创建etcd的key时没有成功，再次尝试创建key，如下:
+/opt/kubernetes/bin/etcdctl mkdir /kubernetes/network/config
+Error:  dial tcp 127.0.0.1:4001: getsockopt: connection refused
+但是直接创建又报SSL通信错误，查出应该是我的SSL证书有问题，后换了一个认证解决，如下：
+ etcdctl --endpoints=https://192.168.56.11:2379,https://192.168.56.12:2379,https://192.168.56.13:2379 \
+  --ca-file=/opt/kubernetes/ssl/ca.pem \
+  --cert-file=/opt/kubernetes/ssl/kubernetes.pem \
+  --key-file=/opt/kubernetes/ssl/kubernetes-key.pem \
+mkdir /kubernetes/network/config
+ etcdctl --endpoints=https://192.168.56.11:2379,https://192.168.56.12:2379,https://192.168.56.13:2379 \
+  --ca-file=/opt/kubernetes/ssl/ca.pem \
+  --cert-file=/opt/kubernetes/ssl/kubernetes.pem \
+  --key-file=/opt/kubernetes/ssl/kubernetes-key.pem \
+ mk /kubernetes/network/config '{ "Network": "10.2.0.0/16", "Backend": { "Type": "vxlan", "VNI": 1 }}' >/dev/null 2>&1
+ 还需要注意的是：/opt/kubernetes/cfg/flannel文件中FLANNEL_ETCD_KEY="-etcd-prefix=/kubernetes/network"是否与你生产的key的配置路径一致
+```
 启动flannel
 ```
 [root@linux-node1 ~]# systemctl daemon-reload
@@ -111,7 +131,7 @@ mk /kubernetes/network/config '{ "Network": "10.2.0.0/16", "Backend": { "Type": 
 [root@linux-node1 ~]# chmod +x /opt/kubernetes/bin/*
 [root@linux-node1 ~]# systemctl start flannel
 ```
-查看服务状态
+查看服务状态（三台机器均需要启动flannel，key只需要在matser上执行）
 ```
 [root@linux-node1 ~]# systemctl status flannel
 ```
