@@ -143,10 +143,12 @@ node-csr-0_w5F1FM_la_SeGiu3Y5xELRpYUjjT2icIFk9gO9KOU   1m        kubelet-bootstr
 -rw------- 1 root root 1675 Jun  4 07:57 kubelet.key
 ```
 
-执行完毕后，查看节点状态已经是Ready的状态了
+执行完毕后，查看节点状态已经是Ready的状态了,还未部署kube-proxy
 ```
-[root@linux-node1 ssl]#  kubectl get node
+[root@linux-node1 ssl]# kubectl get node 
 NAME            STATUS    ROLES     AGE       VERSION
+192.168.56.12   Ready     <none>    2m        v1.10.1
+192.168.56.13   Ready     <none>    2m        v1.10.1
 ```
 
 ## 部署Kubernetes Proxy
