@@ -123,6 +123,8 @@ mkdir /kubernetes/network/config
   --key-file=/opt/kubernetes/ssl/kubernetes-key.pem \
  mk /kubernetes/network/config '{ "Network": "10.2.0.0/16", "Backend": { "Type": "vxlan", "VNI": 1 }}' >/dev/null 2>&1
  还需要注意的是：/opt/kubernetes/cfg/flannel文件中FLANNEL_ETCD_KEY="-etcd-prefix=/kubernetes/network"是否与你生产的key的配置路径一致
+ 参考链接：https://zhangkesheng.github.io/2018/01/25/kubernetes-ha/
+ 
 ```
 启动flannel
 ```
