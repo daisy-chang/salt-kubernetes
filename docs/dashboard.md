@@ -20,7 +20,7 @@ kubernetes-dashboard is running at https://192.168.56.11:6443/api/v1/namespaces/
 To further debug and diagnose cluster problems, use 'kubectl cluster-info dump'.
 
 ```
-
+## 登录dashborad界面时需要生成token文件
 ```
 kubectl -n kube-system describe secret $(kubectl -n kube-system get secret | grep admin-user | awk '{print $1}')
 ```
