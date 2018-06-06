@@ -1,5 +1,13 @@
 # 手动制作CA证书
-
+## 0 注意事项
+```
+【三台机器/opt/kubernetes/ssl】
+Kubenetes系统各组件需要使用TLS证书对通信进行加密（k8s从1.8开始都要通过ssl证书对通信进行加密，增加了部署难度，每个K8s集群需要独立的一套CA证书体系）
+CA证书管理（自签名的CA证书有三种）：
+  easyrsa（openvpn时会用到）
+  openssl
+  cfssl（json文件的形式将证书发放出去，相对比较简单）
+```
 ## 1.安装 CFSSL
 ```
 [root@linux-node1 ~]# cd /usr/local/src
@@ -15,7 +23,7 @@
 [root@linux-node1 ~]# scp /opt/kubernetes/bin/cfssl* 192.168.56.13: /opt/kubernetes/bin
 ```
 
-## 2.初始化cfssl
+## 2.初始化cfssl(三台机器)
 ```
 [root@linux-node1 src]# mkdir ssl && cd ssl
 [root@linux-node1 ssl]# cfssl print-defaults config > config.json
