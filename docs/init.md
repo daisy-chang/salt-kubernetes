@@ -1,7 +1,7 @@
 
 # 系统环境初始化
 
-## 1.安装Docker
+## 1.安装Docker(三台机器都需要安装)
 
 第一步：使用国内Docker源
 ```
@@ -20,12 +20,12 @@
 [root@linux-node1 ~]# systemctl start docker
 ```
 
-## 2.准备部署目录
+## 2.准备部署目录（三台机器）
 ```
     mkdir -p /opt/kubernetes/{cfg,bin,ssl,log}
 ```
 
-## 3.准备软件包
+## 3.准备软件包（百度云盘中）
 ```
 百度网盘下载地址：
 [https://pan.baidu.com/s/1zs8sCouDeCQJ9lghH1BPiw](https://pan.baidu.com/s/1zs8sCouDeCQJ9lghH1BPiw)
