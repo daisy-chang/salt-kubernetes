@@ -1,6 +1,12 @@
 
 # 手动部署ETCD集群
 
+## 注意事项
+```
+三台机器均部署,核心存储数据库，集群之间通信需要证书
+类似与zookper，分布式协调服务，直接以kv的形式存储在etcd中，之所以说各个服务之间是无状态的，就是他们的数据统一存放在etcd中，etcd也支持集群
+```
+
 ## 0.准备etcd软件包
 ```
 wget https://github.com/coreos/etcd/releases/download/v3.2.18/etcd-v3.2.18-linux-amd64.tar.gz
@@ -61,7 +67,7 @@ wget https://github.com/coreos/etcd/releases/download/v3.2.18/etcd-v3.2.18-linux
 [root@k8s-master ~]# rm -f etcd.csr etcd-csr.json
 ```
 
-## 4.设置ETCD配置文件
+## 4.设置ETCD配置文件(配置文件中74，79，80，85，91要对应上每个节点的ip)
 ```
 [root@linux-node1 ~]# vim /opt/kubernetes/cfg/etcd.conf
 #[member]
@@ -123,7 +129,7 @@ WantedBy=multi-user.target
 # scp /etc/systemd/system/etcd.service 192.168.56.12:/etc/systemd/system/
 # scp /opt/kubernetes/cfg/etcd.conf 192.168.56.13:/opt/kubernetes/cfg/
 # scp /etc/systemd/system/etcd.service 192.168.56.13:/etc/systemd/system/
-在所有节点上创建etcd存储目录并启动etcd
+在所有节点上创建etcd存储目录并启动etcd（三台机器都要创建，启动集群的时候会去检查其它的节点，其它节点也都起来了才会正常启动，注意修改etcd.conf的那么名字）
 [root@linux-node1 ~]# mkdir /var/lib/etcd
 [root@linux-node1 ~]# systemctl start etcd
 [root@linux-node1 ~]# systemctl status etcd
@@ -140,4 +146,17 @@ member 435fb0a8da627a4c is healthy: got healthy result from https://192.168.56.1
 member 6566e06d7343e1bb is healthy: got healthy result from https://192.168.56.11:2379
 member ce7b884e428b6c8c is healthy: got healthy result from https://192.168.56.13:2379
 cluster is healthy
+```
+## 8.查看端口2379 2380
+```
+[root@linux-node1 etcd-v3.2.18-linux-amd64]# netstat -ntlp
+Active Internet connections (only servers)
+Proto Recv-Q Send-Q Local Address           Foreign Address         State       PID/Program name    
+tcp        0      0 192.168.56.11:2379      0.0.0.0:*               LISTEN      13791/etcd          
+tcp        0      0 127.0.0.1:2379          0.0.0.0:*               LISTEN      13791/etcd          
+tcp        0      0 192.168.56.11:2380      0.0.0.0:*               LISTEN      13791/etcd          
+tcp        0      0 0.0.0.0:22              0.0.0.0:*               LISTEN      875/sshd            
+tcp        0      0 127.0.0.1:25            0.0.0.0:*               LISTEN      1072/master         
+tcp6       0      0 :::22                   :::*                    LISTEN      875/sshd            
+tcp6       0      0 ::1:25                  :::*                    LISTEN      1072/master  
 ```
